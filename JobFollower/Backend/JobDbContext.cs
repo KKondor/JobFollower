@@ -5,11 +5,11 @@ namespace JobFollower.Backend
 {
     public class JobDbContext : DbContext
     {
-        public JobDbContext(DbContextOptions options) : base(options)
+        public JobDbContext(DbContextOptions<JobDbContext> options) : base(options)
         {
         }
 
-        public DbSet<User> users => Set<User>();
-        public DbSet<JobApplication> jobApplications => Set<JobApplication>();
+        public DbSet<User> Users => Set<User>();
+        public DbSet<JobApplication> JobApplications => Set<JobApplication>();
     }
 }
