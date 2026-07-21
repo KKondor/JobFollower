@@ -10,6 +10,7 @@ namespace JobFollower.Backend.Endpoints
         public static void MapToUserEndpoints(this IEndpointRouteBuilder group)
         {
             group.MapPost("/register",RegisterUser);
+            group.MapPost("/login",Login);
         }
 
         static async Task<Results<Created<UserDto>,ValidationProblem>> RegisterUser(RegisterUserDto user,IUserService userService)
@@ -23,6 +24,14 @@ namespace JobFollower.Backend.Endpoints
 
             var savedUser = await userService.CreateUserAsync(user);
             return TypedResults.Created($"/{savedUser.UserId}", savedUser);
+        }
+        static async Task<Results<Ok<string>, UnauthorizedHttpResult>> Login(LoginDto login, IUserService userService, TokenService tokenService)
+        {
+            var user = await userService.ValidateUserAsync(login.Email, login.Password);
+            if (user is null) return TypedResults.Unauthorized();
+
+            var token = tokenService.GenerateToken(user);
+            return TypedResults.Ok(token);
         }
     }
 }

@@ -17,7 +17,7 @@ namespace JobFollower.Backend.Model
         [Key]
         public int JobId { get; set; }
         public int UserId { get; set; }
-        public required User User { get; set; }
+        public User? User { get; set; }
         [MaxLength(100)]
         public required string JobName { get; set; }
         [MaxLength(1000)]

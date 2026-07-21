@@ -5,5 +5,6 @@ namespace JobFollower.Backend.Service
     public interface IUserService
     {
         Task<UserDto> CreateUserAsync(RegisterUserDto user);
+        Task<UserDto?> ValidateUserAsync(string email, string password);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using JobFollower.Backend.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace JobFollower.Backend.Repository
 {
@@ -12,6 +13,13 @@ namespace JobFollower.Backend.Repository
             var result = await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();
             return user;
+        }
+
+        public async Task<User?> FindByEmail(string email)
+        {
+            var querry = _dbContext.Users.AsQueryable();
+            querry = querry.Where(x => x.Email == email);
+            return await querry.FirstOrDefaultAsync();
         }
     }
 }

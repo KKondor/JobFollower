@@ -10,7 +10,7 @@ namespace JobFollower.Backend.Service
 
         public JobService(IJobRepository jobRepository) => _jobRepository = jobRepository;
 
-        public async Task<JobApplicationDto> CreateJobAsync(JobApplicationDto job, User user)
+        public async Task<JobApplicationDto> CreateJobAsync(JobApplicationDto job, int userId)
         {
             JobApplication convertedJob = new JobApplication
             {
@@ -18,16 +18,15 @@ namespace JobFollower.Backend.Service
                 JobDescription = job.JobDescription,
                 Status = job.Status,
                 AppliedDate = job.AppliedDate,
-                User = user,
-                UserId = user.UserId
+                UserId = userId,
             };
             var created = await _jobRepository.CreateJobAsync(convertedJob);
             return new JobApplicationDto(created);
         }
 
-        public async Task<bool> DeleteJobAsync(int id)
+        public async Task<bool> DeleteJobAsync(int userId,int id)
         {
-            return await _jobRepository.DeleteJobAsync(id);
+            return await _jobRepository.DeleteJobAsync(userId,id);
         }
 
         public async Task<List<JobApplicationDto>> GetAllJobsAsync()
@@ -42,9 +41,9 @@ namespace JobFollower.Backend.Service
             return jobs.Select(x => new JobApplicationDto(x)).ToList();
         }
 
-        public async Task<JobApplicationDto?> GetJobApplicationByIdAsync(int id)
+        public async Task<JobApplicationDto?> GetJobApplicationByIdAsync(int userId,int id)
         {
-            var job = await _jobRepository.GetJobByIdAsync(id);
+            var job = await _jobRepository.GetJobByIdAsync(userId,id);
             return job == null ? null : new JobApplicationDto(job);
         }
 
@@ -54,9 +53,9 @@ namespace JobFollower.Backend.Service
             return jobs.Select(job => new JobApplicationDto(job)).ToList();
         }
 
-        public async Task<JobApplicationDto?> PatchJobAsync(int id, JobPatchDto job)
+        public async Task<JobApplicationDto?> PatchJobAsync(int userId,int id, JobPatchDto job)
         {
-            var foundJob = await _jobRepository.GetJobByIdAsync(id);
+            var foundJob = await _jobRepository.GetJobByIdAsync(userId,id);
             if (foundJob == null) return null;
 
             if (job.JobName is not null) foundJob.JobName = job.JobName;
@@ -64,7 +63,7 @@ namespace JobFollower.Backend.Service
             if (job.Status is not null) foundJob.Status = job.Status.Value;
             if (job.AppliedDate is not null) foundJob.AppliedDate = job.AppliedDate.Value;
 
-            var result = await _jobRepository.UpdateJobAsync(id, foundJob);
+            var result = await _jobRepository.UpdateJobAsync(userId,id, foundJob);
             if (result == null) return null;
             return new JobApplicationDto(result);
         }

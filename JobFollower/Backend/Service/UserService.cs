@@ -7,7 +7,7 @@ namespace JobFollower.Backend.Service
 {
     public class UserService : IUserService
     {
-        private PasswordHasher<RegisterUserDto> _passwordHasher = new();
+        private PasswordHasher<User> _passwordHasher = new();
         private readonly IUserRepository _userRepository;
         public UserService(IUserRepository userRepository) => _userRepository = userRepository;
 
@@ -17,10 +17,20 @@ namespace JobFollower.Backend.Service
             {
                 Name = user.Name,
                 Email = user.Email,
-                HashedPassword = _passwordHasher.HashPassword(user, user.Password)
+                HashedPassword = ""
             };
+            convertedUser.HashedPassword = _passwordHasher.HashPassword(convertedUser, user.Password);
             var created = await _userRepository.CreateUser(convertedUser);
-            return new UserDto(convertedUser);
+            return new UserDto(created);
+        }
+
+        public async Task<UserDto?> ValidateUserAsync(string email, string password)
+        {
+            var foundUser = await _userRepository.FindByEmail(email);
+            if (foundUser == null) return null;
+            PasswordVerificationResult result = _passwordHasher.VerifyHashedPassword(foundUser, foundUser.HashedPassword, password);
+            if (result == PasswordVerificationResult.Success) return new UserDto(foundUser);
+            return null;
         }
     }
 }

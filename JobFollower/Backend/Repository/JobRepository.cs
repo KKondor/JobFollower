@@ -9,7 +9,10 @@ namespace JobFollower.Backend.Repository
         public JobRepository(JobDbContext jobDb) => _jobdb = jobDb;
         public async Task<List<JobApplication>> GetAllJobsAsync() => await _jobdb.JobApplications.ToListAsync();
 
-        public async Task<JobApplication?> GetJobByIdAsync(int id) => await _jobdb.JobApplications.FindAsync(id);
+        public async Task<JobApplication?> GetJobByIdAsync(int userId, int id)
+        {
+            return await _jobdb.JobApplications.Where(x => x.UserId == userId && x.JobId == id).FirstOrDefaultAsync();
+        }
         public async Task<List<JobApplication>> GetJobsByUserId(int userId)
         {
             var querry = _jobdb.JobApplications.AsQueryable();
@@ -38,9 +41,9 @@ namespace JobFollower.Backend.Repository
             return job;
         }
 
-        public async Task<JobApplication?> UpdateJobAsync(int id, JobApplication job)
+        public async Task<JobApplication?> UpdateJobAsync(int userId,int id, JobApplication job)
         {
-            var foundJob = await _jobdb.JobApplications.FindAsync(id);
+            var foundJob = await _jobdb.JobApplications.Where(x => x.UserId == userId && x.JobId == id).FirstOrDefaultAsync();
             if (foundJob == null) return null;
 
             foundJob.JobName = job.JobName;
@@ -51,9 +54,9 @@ namespace JobFollower.Backend.Repository
             return foundJob;
         }
 
-        public async Task<bool> DeleteJobAsync(int id)
+        public async Task<bool> DeleteJobAsync(int userId,int id)
         {
-            var foundJob = await _jobdb.JobApplications.FindAsync(id);
+            var foundJob = await _jobdb.JobApplications.Where(x => x.UserId == userId && x.JobId == id).FirstOrDefaultAsync();
             if (foundJob == null) return false;
             _jobdb.JobApplications.Remove(foundJob);
             await _jobdb.SaveChangesAsync();
