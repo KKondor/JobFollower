@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace JobFollower.Backend.Model
+namespace JobFollower.Backend.Model.DTO
 {
-    public class User
+    public class RegisterUserDto
     {
         [Key]
         public int UserId { get; set; }
@@ -10,6 +10,8 @@ namespace JobFollower.Backend.Model
         public required String Name { get; set; }
         [EmailAddress]
         public required String Email { get; set; }
-        public required String HashedPassword { get; set; }
+        public required String Password { get; set; }
+
+        public RegisterUserDto() { }
     }
 }
