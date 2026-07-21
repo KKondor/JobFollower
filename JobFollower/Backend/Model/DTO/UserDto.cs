@@ -7,9 +7,9 @@ namespace JobFollower.Backend.Model.DTO
         [Key]
         public int UserId { get; set; }
         [MaxLength(30)]
-        public String Name { get; set; }
+        public string Name { get; set; }
         [EmailAddress]
-        public String Email { get; set; }
+        public string Email { get; set; }
 
         public UserDto() { }
         public UserDto(User user) => (UserId,Name,Email) = (user.UserId,user.Name, user.Email);

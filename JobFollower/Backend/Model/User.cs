@@ -7,9 +7,9 @@ namespace JobFollower.Backend.Model
         [Key]
         public int UserId { get; set; }
         [MaxLength(30)]
-        public required String Name { get; set; }
+        public required string Name { get; set; }
         [EmailAddress]
-        public required String Email { get; set; }
-        public required String HashedPassword { get; set; }
+        public required string Email { get; set; }
+        public required string HashedPassword { get; set; }
     }
 }
