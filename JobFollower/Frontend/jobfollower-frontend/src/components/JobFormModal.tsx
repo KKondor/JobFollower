@@ -8,15 +8,11 @@ interface JobFormModalProps {
     existingJob?: JobApplicationDto;
     onCreate: (job: CreateJobDto) => Promise<void>;
     onUpdate: (id: number, patch: JobPatchDto) => Promise<void>;
+    onDelete: (id: number) => Promise<void>;
 }
 
-export default function JobFormModal({
-                                         isOpen,
-                                         onClose,
-                                         existingJob,
-                                         onCreate,
-                                         onUpdate,
-                                     }: JobFormModalProps) {
+export default function JobFormModal({isOpen, onClose, existingJob,
+                                         onCreate, onUpdate, onDelete,}: JobFormModalProps) {
     const [jobName, setJobName] = useState("");
     const [jobDescription, setJobDescription] = useState("");
     const [status, setStatus] = useState<string>(StatusState.NotApplied);
@@ -53,6 +49,13 @@ export default function JobFormModal({
             });
         }
 
+        onClose();
+    }
+
+    async function handleDelete() {
+        if (!existingJob) return;
+        if (!confirm(`Delete "${existingJob.jobName}"? This can't be undone.`)) return;
+        await onDelete(existingJob.jobId);
         onClose();
     }
 
@@ -96,6 +99,11 @@ export default function JobFormModal({
                         ))}
                     </select>
                     <button type="submit">{existingJob ? "Save" : "Create"}</button>
+                    {existingJob && (
+                        <button type="button" onClick={handleDelete} style={{ color: "red" }}>
+                            Delete
+                        </button>
+                    )}
                 </form>
             </div>
         </div>

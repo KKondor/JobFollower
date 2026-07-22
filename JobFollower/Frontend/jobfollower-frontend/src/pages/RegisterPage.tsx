@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
 
 export default function RegisterPage() {
@@ -22,6 +22,7 @@ export default function RegisterPage() {
     }
 
     return (
+        <>
         <form onSubmit={handleSubmit}>
             <h1>Register</h1>
             {error && <p style={{ color: "red" }}>{error}</p>}
@@ -48,5 +49,7 @@ export default function RegisterPage() {
             />
             <button type="submit">Register</button>
         </form>
+            <p>Already have an account? <Link to="/login">Login</Link></p>
+        </>
     );
 }

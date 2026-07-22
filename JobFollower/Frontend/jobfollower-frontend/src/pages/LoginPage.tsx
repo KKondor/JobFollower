@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
 
 export default function LoginPage() {
@@ -21,6 +21,7 @@ export default function LoginPage() {
     }
 
     return (
+        <>
         <form onSubmit={handleSubmit}>
             <h1>Login</h1>
             {error && <p style={{ color: "red" }}>{error}</p>}
@@ -40,5 +41,7 @@ export default function LoginPage() {
             />
             <button type="submit">Log In</button>
         </form>
+    <p>Don't have an account? <Link to="/register">Register</Link></p>
+    </>
     );
 }

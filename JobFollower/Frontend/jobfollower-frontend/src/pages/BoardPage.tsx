@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { DndContext, useSensor, useSensors, PointerSensor } from "@dnd-kit/core";
 import type { DragEndEvent } from "@dnd-kit/core";
-import { getJobs, createJob, patchJob } from "../api/jobsApi";
+import { getJobs, createJob, patchJob, deleteJob } from "../api/jobsApi";
 import type { JobApplicationDto, CreateJobDto, JobPatchDto } from "../types/job";
 import { StatusState } from "../types/job";
 import JobColumn from "../components/JobColumn";
@@ -56,6 +56,11 @@ export default function BoardPage() {
         setJobs((prev) => prev.map((j) => (j.jobId === id ? updated : j)));
     }
 
+    async function handleDelete(id: number) {
+        await deleteJob(id);
+        setJobs((prev) => prev.filter((j) => j.jobId !== id));
+    }
+
     async function handleDragEnd(event: DragEndEvent) {
         const { active, over } = event;
         if (!over) return;
@@ -104,6 +109,7 @@ export default function BoardPage() {
                 existingJob={editingJob}
                 onCreate={handleCreate}
                 onUpdate={handleUpdate}
+                onDelete={handleDelete}
             />
         </div>
     );
