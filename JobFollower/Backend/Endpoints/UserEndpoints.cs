@@ -27,7 +27,7 @@ namespace JobFollower.Backend.Endpoints
             var savedUser = await userService.CreateUserAsync(user);
             return TypedResults.Created($"/{savedUser.UserId}", savedUser);
         }
-        static async Task<Results<Ok<string>, UnauthorizedHttpResult>> Login(LoginDto login, IUserService userService, TokenService tokenService, HttpContext httpContext)
+        static async Task<Results<Ok<LoginResponseDto>, UnauthorizedHttpResult>> Login(LoginDto login, IUserService userService, TokenService tokenService, HttpContext httpContext)
         {
             var user = await userService.ValidateUserAsync(login.Email, login.Password);
             if (user is null) return TypedResults.Unauthorized();
@@ -43,7 +43,7 @@ namespace JobFollower.Backend.Endpoints
                 Expires = DateTimeOffset.UtcNow.AddDays(7)
             });
 
-            return TypedResults.Ok(accessToken);
+            return TypedResults.Ok(new LoginResponseDto(accessToken,user));
         }
         static async Task<Results<Ok<string>, UnauthorizedHttpResult>> Refresh(IUserService userService, HttpContext httpContext)
         {
