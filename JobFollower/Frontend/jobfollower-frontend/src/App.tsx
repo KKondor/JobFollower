@@ -1,14 +1,24 @@
-import { useEffect } from "react";
-import api from "./api/axiosInstance";
+import { Routes, Route } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import BoardPage from "./pages/BoardPage";
+import ProtectedRoute from "./auth/ProtectedRoute";
 
 function App() {
-  useEffect(() => {
-    api.get("/jobs")
-        .then((res) => console.log("Success:", res.data))
-        .catch((err) => console.log("Error:", err.response?.status, err.message));
-  }, []);
-
-  return <div>Testing API connection...</div>;
+  return (
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route
+            path="/board"
+            element={
+              <ProtectedRoute>
+                <BoardPage />
+              </ProtectedRoute>
+            }
+        />
+      </Routes>
+  );
 }
 
 export default App;
