@@ -23,3 +23,10 @@ export interface JobPatchDto {
     status?: StatusState;
     appliedDate?: string;
 }
+
+export interface CreateJobDto {
+    jobName: string;
+    jobDescription: string | null;
+    status: StatusState;
+    appliedDate: string;
+}

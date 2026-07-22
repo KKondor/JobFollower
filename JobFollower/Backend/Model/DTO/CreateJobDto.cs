@@ -19,4 +19,4 @@ namespace JobFollower.Backend.Model.DTO
             (jobApplication.JobName, jobApplication.JobDescription, jobApplication.Status, jobApplication.AppliedDate);
     }
 }
-}
+
