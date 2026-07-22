@@ -56,7 +56,7 @@ namespace JobFollower.Backend.Service
             return rawToken;
         }
 
-        public async Task<string?> RefreshAccessTokenAsync(string rawRefreshToken, Func<string, Task> setNewCookie)
+        public async Task<LoginResponseDto?> RefreshAccessTokenAsync(string rawRefreshToken, Func<string, Task> setNewCookie)
         {
             var hashedToken = _tokenService.HashToken(rawRefreshToken);
             var storedToken = await _userRepository.GetByHashAsync(hashedToken);
@@ -73,7 +73,7 @@ namespace JobFollower.Backend.Service
             var user = await _userRepository.FindByIdAsync(storedToken.UserId);
             if (user is null) return null;
 
-            return _tokenService.GenerateToken(new UserDto(user));
+            return new LoginResponseDto(_tokenService.GenerateToken(new UserDto(user)), new UserDto(user));
         }
         public async Task RevokeRefreshTokenAsync(string rawRefreshToken)
         {

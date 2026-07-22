@@ -45,7 +45,7 @@ namespace JobFollower.Backend.Endpoints
 
             return TypedResults.Ok(new LoginResponseDto(accessToken,user));
         }
-        static async Task<Results<Ok<string>, UnauthorizedHttpResult>> Refresh(IUserService userService, HttpContext httpContext)
+        static async Task<Results<Ok<LoginResponseDto>, UnauthorizedHttpResult>> Refresh(IUserService userService, HttpContext httpContext)
         {
             var rawRefreshToken = httpContext.Request.Cookies["refreshToken"];
             if (string.IsNullOrEmpty(rawRefreshToken))
@@ -65,13 +65,13 @@ namespace JobFollower.Backend.Endpoints
                     return Task.CompletedTask;
                 });
 
-            if (newAccessToken is null)
+            if (newAccessToken is null || newAccessToken.User is null || newAccessToken.AccessToken is null)
             {
                 httpContext.Response.Cookies.Delete("refreshToken");
                 return TypedResults.Unauthorized();
             }
 
-            return TypedResults.Ok(newAccessToken);
+            return TypedResults.Ok(new LoginResponseDto(newAccessToken.AccessToken, newAccessToken.User));
         }
 
         static async Task<Results<Ok<string>, UnauthorizedHttpResult>> Logout(IUserService userService, HttpContext httpContext)
