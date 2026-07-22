@@ -39,7 +39,7 @@ namespace JobFollower.Backend.Endpoints
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.None,
                 Expires = DateTimeOffset.UtcNow.AddDays(7)
             });
 
@@ -59,7 +59,7 @@ namespace JobFollower.Backend.Endpoints
                     {
                         HttpOnly = true,
                         Secure = true,
-                        SameSite = SameSiteMode.Strict,
+                        SameSite = SameSiteMode.None,
                         Expires = DateTimeOffset.UtcNow.AddDays(7)
                     });
                     return Task.CompletedTask;
