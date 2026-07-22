@@ -40,7 +40,7 @@ namespace JobFollower.Backend.Endpoints
                     ? TypedResults.Ok(jobApplication)
                     : TypedResults.NotFound();
         }
-        static async Task<Results<Created<JobApplicationDto>, ValidationProblem>> CreateJob(JobApplicationDto job,ClaimsPrincipal claimsPrincipal, IJobService service)
+        static async Task<Results<Created<JobApplicationDto>, ValidationProblem>> CreateJob(CreateJobDto job,ClaimsPrincipal claimsPrincipal, IJobService service)
         {
             var errors = ValidationHelper.Validate(job);
             if (errors.Count > 0)

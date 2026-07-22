@@ -10,7 +10,7 @@ namespace JobFollower.Backend.Service
 
         public JobService(IJobRepository jobRepository) => _jobRepository = jobRepository;
 
-        public async Task<JobApplicationDto> CreateJobAsync(JobApplicationDto job, int userId)
+        public async Task<JobApplicationDto> CreateJobAsync(CreateJobDto job, int userId)
         {
             JobApplication convertedJob = new JobApplication
             {

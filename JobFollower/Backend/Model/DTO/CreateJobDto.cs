@@ -1,0 +1,22 @@
+﻿using System.ComponentModel.DataAnnotations;
+using static JobFollower.Backend.Model.JobApplication;
+
+namespace JobFollower.Backend.Model.DTO
+{
+    public class CreateJobDto
+    {
+        [MaxLength(100)]
+        public string JobName { get; set; }
+        [MaxLength(10000)]
+        public string? JobDescription { get; set; }
+        [Range(0, 5)]
+        public StatusState Status { get; set; } = StatusState.NotApplied;
+        public DateTime AppliedDate { get; set; }
+
+        public CreateJobDto() { }
+        public CreateJobDto(JobApplication jobApplication) =>
+            (JobName, JobDescription, Status, AppliedDate) =
+            (jobApplication.JobName, jobApplication.JobDescription, jobApplication.Status, jobApplication.AppliedDate);
+    }
+}
+}
