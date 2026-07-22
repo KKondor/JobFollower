@@ -7,14 +7,29 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
+var MyAllowedSpecificOrigins = "_myAllowSpecificOrigins";
+
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddProblemDetails();
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy(name: MyAllowedSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins(builder.Configuration.GetConnectionString("DefaultFrontEnd"))
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                      });
+});
 
 builder.Services.AddScoped<IJobRepository, JobRepository>();
 builder.Services.AddScoped<IJobService, JobService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<TokenService>();
-
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<JobDbContext>(opt => opt.UseNpgsql(connectionString));
@@ -36,6 +51,30 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
+app.UseCors(MyAllowedSpecificOrigins);
+
+app.UseExceptionHandler(exceptionHandlerApp
+    => exceptionHandlerApp.Run(async context => await Results.Problem().ExecuteAsync(context)));
+
+app.UseStatusCodePages(statusCodeHandlerApp =>
+{
+    statusCodeHandlerApp.Run(async httpContext =>
+    {
+        var pds = httpContext.RequestServices.GetService<IProblemDetailsService>();
+        if (pds == null
+            || !await pds.TryWriteAsync(new() { HttpContext = httpContext }))
+        {
+            await httpContext.Response.WriteAsync("Fallback: An error occurred.");
+        }
+    });
+});
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();

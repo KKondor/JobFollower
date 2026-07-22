@@ -1,5 +1,6 @@
 ﻿using JobFollower.Backend.Model;
 using JobFollower.Backend.Model.DTO;
+using JobFollower.Backend.Model.Token;
 using JobFollower.Backend.Repository;
 using Microsoft.AspNetCore.Identity;
 
@@ -9,7 +10,12 @@ namespace JobFollower.Backend.Service
     {
         private PasswordHasher<User> _passwordHasher = new();
         private readonly IUserRepository _userRepository;
-        public UserService(IUserRepository userRepository) => _userRepository = userRepository;
+        private readonly TokenService _tokenService;
+        public UserService(IUserRepository userRepository, TokenService tokenService)
+        {
+            _userRepository = userRepository;
+            _tokenService = tokenService;
+        }
 
         public async Task<UserDto> CreateUserAsync(RegisterUserDto user)
         {
@@ -31,6 +37,50 @@ namespace JobFollower.Backend.Service
             PasswordVerificationResult result = _passwordHasher.VerifyHashedPassword(foundUser, foundUser.HashedPassword, password);
             if (result == PasswordVerificationResult.Success) return new UserDto(foundUser);
             return null;
+        }
+
+        public async Task<string> CreateRefreshTokenAsync(int userId)
+        {
+            var rawToken = _tokenService.GenerateRefreshToken();
+            var hashedToken = _tokenService.HashToken(rawToken);
+
+            var refreshToken = new RefreshToken
+            {
+                TokenHash = hashedToken,
+                UserId = userId,
+                ExpiresAt = DateTime.UtcNow.AddDays(7)
+            };
+
+            await _userRepository.SaveRefreshToken(refreshToken);
+
+            return rawToken;
+        }
+
+        public async Task<string?> RefreshAccessTokenAsync(string rawRefreshToken, Func<string, Task> setNewCookie)
+        {
+            var hashedToken = _tokenService.HashToken(rawRefreshToken);
+            var storedToken = await _userRepository.GetByHashAsync(hashedToken);
+
+            if (storedToken is null || storedToken.IsRevoked || storedToken.ExpiresAt < DateTime.UtcNow)
+                return null;
+
+            storedToken.IsRevoked = true;
+            await _userRepository.RevokeTokenAsync(storedToken);
+
+            var newRawToken = await CreateRefreshTokenAsync(storedToken.UserId);
+            await setNewCookie(newRawToken);
+
+            var user = await _userRepository.FindByIdAsync(storedToken.UserId);
+            if (user is null) return null;
+
+            return _tokenService.GenerateToken(new UserDto(user));
+        }
+        public async Task RevokeRefreshTokenAsync(string rawRefreshToken)
+        {
+            var hashedToken = _tokenService.HashToken(rawRefreshToken);
+            var storedToken = await _userRepository.GetByHashAsync(hashedToken);
+            if (storedToken is null) return;
+            await _userRepository.RevokeTokenAsync(storedToken);
         }
     }
 }

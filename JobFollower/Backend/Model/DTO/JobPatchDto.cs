@@ -7,7 +7,7 @@ namespace JobFollower.Backend.Model.DTO
     {
         [MaxLength(100)]
         public string? JobName { get; set; }
-        [MaxLength(1000)]
+        [MaxLength(10000)]
         public string? JobDescription { get; set; }
         [Range(0,5)]
         public StatusState? Status { get; set; } = StatusState.NotApplied;
