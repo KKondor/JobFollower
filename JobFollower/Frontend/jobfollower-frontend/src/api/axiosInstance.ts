@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getAccessToken, setAccessToken } from "./tokenStore";
+import type {LoginResponseDto} from "../types/user.ts";
 
 const api = axios.create({
     baseURL: "https://localhost:7096",
@@ -26,12 +27,12 @@ api.interceptors.response.use(
         ) {
             originalRequest._retry = true;
             try {
-                const refreshResponse = await axios.post(
+                const refreshResponse = await axios.post<LoginResponseDto>(
                     "https://localhost:7096/auth/refresh",
                     {},
                     { withCredentials: true }
                 );
-                const newToken = refreshResponse.data;
+                const newToken = refreshResponse.data.accessToken;
                 setAccessToken(newToken);
                 originalRequest.headers.Authorization = `Bearer ${newToken}`;
                 return api(originalRequest); // retry the original request with the new token

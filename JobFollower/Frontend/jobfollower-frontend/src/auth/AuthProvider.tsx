@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import { AuthContext } from "./AuthContext";
-import type { UserDto } from "../types/user";
+import type { UserDto, LoginResponseDto } from "../types/user";
 import { setAccessToken } from "../api/tokenStore";
 import api from "../api/axiosInstance";
 
@@ -27,7 +27,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     useEffect(() => {
-        setIsLoading(false);
+        async function tryRestoreSession() {
+            try {
+                const response = await api.post<LoginResponseDto>("/auth/refresh");
+                setAccessToken(response.data.accessToken);
+                setUser(response.data.user);
+            } catch {
+                setAccessToken(null);
+                setUser(null);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        tryRestoreSession();
     }, []);
 
     return (
