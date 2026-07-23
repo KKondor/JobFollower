@@ -103,3 +103,7 @@
     font-size: 0.85rem;
     margin: 0;
 }
+
+.input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}

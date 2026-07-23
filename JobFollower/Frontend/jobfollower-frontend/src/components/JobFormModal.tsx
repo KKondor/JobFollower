@@ -19,16 +19,19 @@ export default function JobFormModal({isOpen, onClose, existingJob,
     const [status, setStatus] = useState<string>(StatusState.NotApplied);
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [appliedDate, setAppliedDate] = useState("");
 
     useEffect(() => {
         if (existingJob) {
             setJobName(existingJob.jobName);
             setJobDescription(existingJob.jobDescription ?? "");
             setStatus(existingJob.status);
+            setAppliedDate(existingJob.appliedDate.split("T")[0]);
         } else {
             setJobName("");
             setJobDescription("");
             setStatus(StatusState.NotApplied);
+            setAppliedDate(new Date().toISOString().split("T")[0]);
         }
     }, [existingJob, isOpen]);
 
@@ -44,14 +47,14 @@ export default function JobFormModal({isOpen, onClose, existingJob,
                     jobName,
                     jobDescription: jobDescription || undefined,
                     status: status as JobApplicationDto["status"],
+                    appliedDate: new Date(appliedDate).toISOString(),
                 });
-
             } else {
                 await onCreate({
                     jobName,
                     jobDescription: jobDescription || null,
                     status: status as JobApplicationDto["status"],
-                    appliedDate: new Date().toISOString(),
+                    appliedDate: new Date(appliedDate).toISOString(),
                 });
             }
 
@@ -107,6 +110,13 @@ export default function JobFormModal({isOpen, onClose, existingJob,
                             <option key={s} value={s}>{s}</option>
                         ))}
                     </select>
+                    <input
+                        type="date"
+                        value={appliedDate}
+                        onChange={(e) => setAppliedDate(e.target.value)}
+                        className={styles.input}
+                        required
+                    />
                     <div className={styles.actions}>
                         <button type="submit" className={styles.submitButton} disabled={isSubmitting}>
                             {isSubmitting ? "Saving..." : existingJob ? "Save" : "Create"}
