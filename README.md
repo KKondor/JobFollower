@@ -47,7 +47,7 @@ A full-stack job application tracker with a drag-and-drop Kanban board. Built to
 ## Running locally
 
 ### Backend
-1. `cd Backend`
+1. `cd JobFollower/Backend`
 2. Set up a PostgreSQL connection string (e.g. a free [Neon](https://neon.tech) project) and add it to your user secrets or `appsettings.Development.json`:
    ```json
    {
@@ -66,7 +66,7 @@ A full-stack job application tracker with a drag-and-drop Kanban board. Built to
 4. Run: `dotnet run` (defaults to `https://localhost:7096`)
 
 ### Frontend
-1. `cd Frontend`
+1. `cd JobFollower/Frontend/jobfollower-frontend`
 2. `npm install`
 3. Create a `.env` file:
    ```
