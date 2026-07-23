@@ -1,8 +1,14 @@
 # JobFollower
 
-A full-stack job application tracker with a drag-and-drop Kanban board. Built to actually use during my own job search — track applications from "Not Applied" through "Interviewed" to "Accepted" or "Rejected" without juggling spreadsheets.
+A full-stack job application tracker with a drag-and-drop Kanban board. Built to actually use during my own job search. Track applications from "Not Applied" through "Interviewed" to "Accepted" or "Rejected" without juggling spreadsheets.
 
 **Live demo:** https://job-follower.vercel.app
+
+***If u don't wish to use your own email feel free to use the sample account:***
+
+**Email:** *user@user.com*
+
+**Password:** *user*
 
 > **Note on cross-browser auth:** the token cookies currently relie on cross-origin cookies between the frontend (Vercel) and backend (Render) domains.
 >  Chrome allows this by default; Safari and Firefox block third-party cookies by default and will block you from doing all functions and
