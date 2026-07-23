@@ -1,6 +1,7 @@
 import { useDroppable } from "@dnd-kit/core";
 import type { JobApplicationDto } from "../types/job";
 import JobCard from "./JobCard";
+import styles from "./JobColumn.module.css"
 
 interface JobColumnProps {
     status: string;
@@ -14,14 +15,9 @@ export default function JobColumn({ status, jobs, onCardClick }: JobColumnProps)
     return (
         <div
             ref={setNodeRef}
-            style={{
-                flex: 1,
-                border: "1px solid #ccc",
-                padding: "0.5rem",
-                backgroundColor: isOver ? "#eef" : undefined,
-            }}
+            className={`${styles.column} ${isOver ? styles.columnOver : ""}`}
         >
-            <h2>{status}</h2>
+            <h2 className={styles.columnTitle}>{status}</h2>
             {jobs.map((job) => (
                 <JobCard key={job.jobId} job={job} onClick={() => onCardClick(job)} />
             ))}

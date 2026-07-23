@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
+import styles from "./Navbar.module.css"
 
 export default function NavBar() {
     const { user, logout } = useAuth();
@@ -11,17 +12,17 @@ export default function NavBar() {
     }
 
     return (
-        <nav style={{ display: "flex", justifyContent: "space-between", padding: "1rem", borderBottom: "1px solid #ccc" }}>
-            <Link to="/">JobFollower</Link>
+        <nav className={styles.navbar}>
+            <Link to="/" className={styles.brand}>JobFollower</Link>
             {user ? (
                 <div>
-                    <span style={{ marginRight: "1rem" }}>{user.name}</span>
-                    <button onClick={handleLogout}>Logout</button>
+                    <span className={styles.userName}>{user.name}</span>
+                    <button className={styles.logoutButton} onClick={handleLogout}>Logout</button>
                 </div>
             ) : (
-                <div>
-                    <Link to="/login" style={{ marginRight: "1rem" }}>Login</Link>
-                    <Link to="/register">Register</Link>
+                <div className={styles.links}>
+                    <Link className="navbar-link" to="/login" style={{ marginRight: "1rem" }}>Login</Link>
+                    <Link className="navbar-link" to="/register">Register</Link>
                 </div>
             )}
         </nav>

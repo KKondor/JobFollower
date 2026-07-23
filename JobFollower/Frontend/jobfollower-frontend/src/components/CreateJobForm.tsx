@@ -16,25 +16,26 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
     async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
         setError(null);
+
         try {
             const newJob: CreateJobDto = {
                 jobName,
                 jobDescription: jobDescription || null,
                 status: StatusState.NotApplied,
-                appliedDate: new Date().toISOString(),
+                appliedDate: applyDate ? new Date(applyDate).toISOString() : new Date().toISOString(),
             };
             const created = await createJob(newJob);
             onJobCreated(created);
             setJobName("");
             setJobDescription("");
+            setApplyDate("");
         } catch {
             setError("Failed to create job application.");
         }
     }
-
     return (
-        <form onSubmit={handleSubmit}>
-            {error && <p style={{ color: "red" }}>{error}</p>}
+        <form className="create-job-form" onSubmit={handleSubmit}>
+            {error && <p className="create-job-form-error">{error}</p>}
             <input
                 type="text"
                 placeholder="Job title"

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import type { JobApplicationDto, CreateJobDto, JobPatchDto } from "../types/job";
 import { StatusState } from "../types/job";
+import styles from "./JobFormModal.module.css";
 
 interface JobFormModalProps {
     isOpen: boolean;
@@ -16,6 +17,8 @@ export default function JobFormModal({isOpen, onClose, existingJob,
     const [jobName, setJobName] = useState("");
     const [jobDescription, setJobDescription] = useState("");
     const [status, setStatus] = useState<string>(StatusState.NotApplied);
+    const [error, setError] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         if (existingJob) {
@@ -33,23 +36,39 @@ export default function JobFormModal({isOpen, onClose, existingJob,
 
     async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
+        setError(null)
+        setIsSubmitting(true);
+        try {
+            if (existingJob) {
+                await onUpdate(existingJob.jobId, {
+                    jobName,
+                    jobDescription: jobDescription || undefined,
+                    status: status as JobApplicationDto["status"],
+                });
 
-        if (existingJob) {
-            await onUpdate(existingJob.jobId, {
-                jobName,
-                jobDescription: jobDescription || undefined,
-                status: status as JobApplicationDto["status"],
-            });
-        } else {
-            await onCreate({
-                jobName,
-                jobDescription: jobDescription || null,
-                status: status as JobApplicationDto["status"],
-                appliedDate: new Date().toISOString(),
-            });
+            } else {
+                await onCreate({
+                    jobName,
+                    jobDescription: jobDescription || null,
+                    status: status as JobApplicationDto["status"],
+                    appliedDate: new Date().toISOString(),
+                });
+            }
+
+            onClose();
         }
-
-        onClose();
+        catch (err:any){
+            const errors = err.response?.data?.errors;
+            if (errors) {
+                const firstMessage = Object.values(errors)[0] as string[];
+                setError(firstMessage[0]);
+            } else {
+                setError("Something went wrong. Please try again.");
+            }
+        }
+        finally {
+            setIsSubmitting(false);
+        }
     }
 
     async function handleDelete() {
@@ -60,31 +79,20 @@ export default function JobFormModal({isOpen, onClose, existingJob,
     }
 
     return (
-        <div
-            style={{
-                position: "fixed",
-                inset: 0,
-                backgroundColor: "rgba(0,0,0,0.5)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-            }}
-            onClick={onClose}
-        >
-            <div
-                style={{ background: "white", padding: "1.5rem", borderRadius: "8px", minWidth: "320px" }}
-                onClick={(e) => e.stopPropagation()}
-            >
-                <button type="button" onClick={onClose} style={{ float: "right" }}>
+        <div className={styles.overlay} onClick={onClose}>
+            <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+                <button type="button" onClick={onClose} className={styles.closeButton}>
                     ×
                 </button>
-                <h2>{existingJob ? "Edit Job" : "New Job"}</h2>
-                <form onSubmit={handleSubmit}>
+                <h2 className={styles.title}>{existingJob ? "Edit Job" : "New Job"}</h2>
+                <form onSubmit={handleSubmit} className={styles.form}>
+                    {error && <p className={styles.error}>{error}</p>}
                     <input
                         type="text"
                         placeholder="Job title"
                         value={jobName}
                         onChange={(e) => setJobName(e.target.value)}
+                        className={styles.input}
                         required
                     />
                     <input
@@ -92,18 +100,23 @@ export default function JobFormModal({isOpen, onClose, existingJob,
                         placeholder="Description (optional)"
                         value={jobDescription}
                         onChange={(e) => setJobDescription(e.target.value)}
+                        className={styles.input}
                     />
-                    <select value={status} onChange={(e) => setStatus(e.target.value)}>
+                    <select value={status} onChange={(e) => setStatus(e.target.value)} className={styles.select}>
                         {Object.values(StatusState).map((s) => (
                             <option key={s} value={s}>{s}</option>
                         ))}
                     </select>
-                    <button type="submit">{existingJob ? "Save" : "Create"}</button>
-                    {existingJob && (
-                        <button type="button" onClick={handleDelete} style={{ color: "red" }}>
-                            Delete
+                    <div className={styles.actions}>
+                        <button type="submit" className={styles.submitButton} disabled={isSubmitting}>
+                            {isSubmitting ? "Saving..." : existingJob ? "Save" : "Create"}
                         </button>
-                    )}
+                        {existingJob && (
+                            <button type="button" onClick={handleDelete} className={styles.deleteButton}>
+                                Delete
+                            </button>
+                        )}
+                    </div>
                 </form>
             </div>
         </div>
