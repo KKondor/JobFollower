@@ -38,7 +38,7 @@ api.interceptors.response.use(
                 return api(originalRequest);
             } catch (refreshError) {
                 setAccessToken(null);
-                // TODO: redirect to login once we build routing
+                window.location.href = "/login";
                 return Promise.reject(refreshError);
             }
         }

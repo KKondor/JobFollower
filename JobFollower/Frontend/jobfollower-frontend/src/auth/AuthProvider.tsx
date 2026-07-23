@@ -17,9 +17,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     async function logout() {
-        await api.post("/auth/logout");
-        setAccessToken(null);
-        setUser(null);
+        try {
+            await api.post("/auth/logout");
+        } catch {
+            // Refresh cookie likely wasn't sent (e.g. Firefox/Safari blocking third-party
+            // cookies) or was already invalid - either way, there's nothing left to revoke
+            // server-side. Proceed with clearing local state regardless.
+        }
+        finally {
+                setAccessToken(null);
+                setUser(null);
+            }
     }
 
     async function register(name: string, email: string, password: string) {
