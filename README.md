@@ -10,7 +10,7 @@ A full-stack job application tracker with a drag-and-drop Kanban board. Built to
 
 **Password:** *user*
 
-> **Note on cross-browser auth:** the token cookies currently relie on cross-origin cookies between the frontend (Vercel) and backend (Render) domains.
+> **Note on cross-browser auth:** the token cookies currently relies on cross-origin cookies between the frontend (Vercel) and backend (Render) domains.
 >  Chrome allows this by default; Safari and Firefox block third-party cookies by default and will block you from doing all functions and
 >  will log you out on page refresh. This is a known limitation of the split-domain deployment (not a bug) — the fix is putting both services under
 >  a shared parent domain, which is on the list of future improvements below. Currently use Chrome for full experience.
